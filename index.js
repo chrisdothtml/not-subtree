@@ -4,6 +4,7 @@ const execa = require('execa')
 const commands = {
   // required args: path, remote
   // optional args: branch, message
+  // TODO: error if path exists
   async add (argv) {
     return execa.shell([
       `git clone ${argv.remote} -b ${argv.branch || 'master'} ${argv.path}`,
@@ -14,10 +15,12 @@ const commands = {
   },
   // required args: path, remote, head-branch
   // optional args: base-branch (d: master)
+  // TODO: log when no changes to pull
   async pull (argv) {
     const baseBranch = argv.baseBranch || 'master'
 
     const { stdout } = await execa.shell([
+      // TODO: use os.tmpdir() instead
       `git clone ${argv.remote} -b ${baseBranch} __temp__`,
       `cd __temp__`,
       `git checkout ${argv.headBranch}`,
@@ -39,6 +42,7 @@ const commands = {
   },
   // required args: remote, path
   // optional args: base-branch (d: master), remote-branch (d: current local branch)
+  // TODO: log when no changes to push
   async push (argv) {
     const { stdout: currentBranch } = await execa.shell(`git branch | grep \\* | cut -d ' ' -f2`)
     const baseBranch = argv.baseBranch || 'master'
@@ -56,6 +60,7 @@ const commands = {
       .join(' ')
 
     return execa.shell([
+      // TODO: use os.tmpdir() instead
       `git clone ${argv.remote} -b ${remoteBranch} __temp__`,
       `cp -R ${filesToCopy} __temp__`,
       `cd __temp__`,
@@ -83,6 +88,7 @@ function parseGitStatusFiles (input) {
 }
 
 async function main () {
+  // TODO: actual arg parser
   const argv = process.argv
     .slice(2)
     .reduce((result, arg) => {
