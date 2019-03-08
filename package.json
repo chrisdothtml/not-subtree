@@ -3,6 +3,9 @@
   "description": "git subtrees without `git subtree`",
   "version": "0.0.1",
   "bin": "./bin/cli.js",
+  "scripts": {
+    "gen-docs": "node generate-docs.js"
+  },
   "dependencies": {
     "execa": "^1.0.0",
     "just-camel-case": "^4.0.2",
