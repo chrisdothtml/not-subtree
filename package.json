@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "dependencies": {
+    "execa": "^1.0.0",
+    "just-camel-case": "^4.0.2"
+  }
+}
