@@ -1,7 +1,11 @@
 {
-  "private": true,
+  "name": "not-subtree",
+  "description": "git subtrees without `git subtree`",
+  "version": "0.0.1",
+  "bin": "./bin/cli.js",
   "dependencies": {
     "execa": "^1.0.0",
-    "just-camel-case": "^4.0.2"
+    "just-camel-case": "^4.0.2",
+    "sade": "^1.4.2"
   }
 }
