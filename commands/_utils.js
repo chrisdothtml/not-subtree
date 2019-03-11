@@ -1,13 +1,13 @@
-// returns Array of filepaths
+// returns Array of { action: 'copy|remove', path: '' }
 function parseGitStatusFiles (input) {
   return input.split('\n')
     .filter(Boolean)
-    .map(line => (
-      line
-        .slice(3)
-        // TODO: don't do /* for dirs, resolve full paths (perf)
-        .replace(/\/$/, '/*')
-    ))
+    .map(line => {
+      const action = /^ D /.test(line) ? 'remove' : 'copy'
+      const path = line.slice(3)
+
+      return { action, path }
+    })
 }
 
 module.exports = {

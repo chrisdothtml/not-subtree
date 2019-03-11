@@ -14,24 +14,31 @@ async function push (argv) {
     `echo "\n\nGIT_STATUS:$(git status -s)"`
   ].join(' && '))
 
-  const filesToCopy = parseGitStatusFiles(stdout.split('GIT_STATUS:')[1])
-    .filter(filepath => filepath.startsWith(argv.path))
-    .join(' ')
+  const gitStatusFiles = parseGitStatusFiles(stdout.split('GIT_STATUS:')[1])
+    .filter(file => file.path.startsWith(argv.path))
+  const filesToCopy = gitStatusFiles
+    .filter(file => file.action === 'copy')
+    .map(file => file.path.replace(/\/$/, ''))
+  const filesToRemove = gitStatusFiles
+    .filter(file => file.action === 'remove')
+    .map(file => file.path.slice(argv.path.length + 1))
 
   return execa.shell([
     // TODO: use os.tmpdir() instead
     `git clone ${argv.remote} -b ${remoteBranch} __temp__`,
-    `cp -R ${filesToCopy} __temp__`,
+    filesToCopy.length && `cp -R ${filesToCopy.join(' ')} __temp__`,
     `cd __temp__`,
+    filesToRemove.length && `rm -rf ${filesToRemove.join(' ')}`,
     `git add .`,
     `git commit -m "${argv.message || 'Update tree'}"`,
     `git push`,
     `cd ..`,
     `rm -rf __temp__`,
     `git checkout .`,
+    `git clean -fd`,
     `git checkout ${currentBranch}`,
     `git branch -D __temp__`
-  ].join(' && '))
+  ].filter(Boolean).join(' && '))
 }
 
 module.exports = (cli) => {

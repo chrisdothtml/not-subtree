@@ -14,17 +14,23 @@ async function pull (argv) {
     `echo "\n\nGIT_STATUS:$(git status -s)"`
   ].join(' && '))
 
-  const filesToCopy = parseGitStatusFiles(stdout.split('GIT_STATUS:')[1])
-    .join(' ')
+  const gitStatusFiles = parseGitStatusFiles(stdout.split('GIT_STATUS:')[1])
+  const filesToCopy = gitStatusFiles
+    .filter(file => file.action === 'copy')
+    .map(file => file.path.replace(/\/$/, ''))
+  const filesToRemove = gitStatusFiles
+    .filter(file => file.action === 'remove')
+    .map(file => argv.path + '/' + file.path)
 
   return execa.shell([
     `cd __temp__`,
-    `cp -R ${filesToCopy} ../${argv.path}`,
+    filesToCopy.length && `cp -R ${filesToCopy.join(' ')} ../${argv.path}`,
     `cd ..`,
+    filesToRemove.length && `rm -rf ${filesToRemove.join(' ')}`,
     `rm -rf __temp__`,
     `git add '${argv.path}/*'`,
     `git commit -m "${argv.message || `Pull '${argv.path}' tree`}"`
-  ].join(' && '))
+  ].filter(Boolean).join(' && '))
 }
 
 module.exports = (cli) => {
