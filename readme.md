@@ -76,3 +76,7 @@ Examples
   $ not-subtree push -p bar -r git@github.com:foo/bar.git
   $ not-subtree push -p bar -r git@github.com:foo/bar.git --remote-branch develop
 ```
+
+## License
+
+[MIT](LICENSE)
