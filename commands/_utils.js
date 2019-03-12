@@ -1,3 +1,4 @@
+const execa = require('execa')
 const fs = require('fs')
 
 // returns Array of { action: 'copy|remove', path: '' }
@@ -21,7 +22,16 @@ function pathExists (path) {
   }
 }
 
+// run a series of commands in the same spawned shell process;
+// filters falsy array elements (for inline conditional commands)
+async function shell (commands) {
+  return execa.shell(
+    commands.filter(Boolean).join(' && ')
+  )
+}
+
 module.exports = {
   parseGitStatusFiles,
-  pathExists
+  pathExists,
+  shell
 }

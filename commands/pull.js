@@ -1,16 +1,15 @@
-const execa = require('execa')
-const { parseGitStatusFiles } = require('./_utils.js')
+const { parseGitStatusFiles, shell } = require('./_utils.js')
 
 async function pull (argv) {
   const baseBranch = argv.baseBranch || 'master'
 
-  const { stdout } = await execa.shell([
+  const { stdout } = await shell([
     `git clone ${argv.remote} -b ${baseBranch} __temp__`,
     `cd __temp__`,
     `git checkout ${argv.headBranch}`,
     `git reset --mixed ${baseBranch}`,
     `echo "GIT_STATUS:$(git status -s)"`
-  ].join(' && '))
+  ])
 
   const changedFiles = parseGitStatusFiles(stdout.split('GIT_STATUS:')[1])
 
@@ -22,28 +21,28 @@ async function pull (argv) {
       .filter(file => file.action === 'remove')
       .map(file => argv.path + '/' + file.path)
 
-    const { stdout } = await execa.shell([
+    const { stdout } = await shell([
       `cd __temp__`,
       filesToCopy.length && `cp -R ${filesToCopy.join(' ')} ../${argv.path}`,
       `cd ..`,
       filesToRemove.length && `rm -rf ${filesToRemove.join(' ')}`,
       `rm -rf __temp__`,
       `echo "GIT_STATUS:$(git status -s)"`
-    ].filter(Boolean).join(' && '))
+    ])
 
     const diffFiles = parseGitStatusFiles(stdout.split('GIT_STATUS:')[1])
 
     if (diffFiles.length) {
-      await execa.shell([
+      await shell([
         `git add '${argv.path}/*'`,
         `git commit -m "${argv.message || `Pull '${argv.path}' tree`}"`
-      ].join(' && '))
+      ])
     } else {
       console.warn('Warning: no changes to pull')
     }
   } else {
     console.warn('Warning: no changes to pull')
-    await execa.shell(`rm -rf __temp__`)
+    await shell([`rm -rf __temp__`])
   }
 }
 
