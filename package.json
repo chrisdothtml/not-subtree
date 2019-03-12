@@ -1,7 +1,7 @@
 {
   "name": "@chrisdothtml/not-subtree",
   "description": "git subtrees without `git subtree`",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Chris Deacy <chrisdothtml@gmail.com>",
   "repository": "github:chrisdothtml/not-subtree",
   "bin": {
