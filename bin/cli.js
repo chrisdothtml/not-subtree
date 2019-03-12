@@ -10,7 +10,7 @@ const cli = sade(binName)
   .version(`v${pkgJson.version}`)
 
 fs.readdirSync(path.resolve(__dirname, '../commands'))
-  .filter(filename => !/^(\.|_)/.test(filename))
+  .filter(filename => !/^(\.|_)|\.test\.js$/.test(filename))
   .forEach((filename) => {
     require(`../commands/${filename}`)(cli)
   })
