@@ -6,11 +6,17 @@
   "repository": "github:chrisdothtml/not-subtree",
   "bin": "./bin/cli.js",
   "scripts": {
-    "gen-docs": "node generate-docs.js"
+    "gen-docs": "node generate-docs.js",
+    "test": "tape 'commands/*.test.js' | tap-summary"
   },
   "dependencies": {
     "execa": "^1.0.0",
     "just-camel-case": "^4.0.2",
     "sade": "^1.4.2"
+  },
+  "devDependencies": {
+    "tap-summary": "^4.0.0",
+    "tape": "^4.10.1",
+    "tape-promise": "^4.0.0"
   }
 }
