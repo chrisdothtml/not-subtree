@@ -5,7 +5,8 @@ const path = require('path')
 const camelCase = require('just-camel-case')
 const sade = require('sade')
 const pkgJson = require('../package.json')
-const cli = sade(pkgJson.name)
+const [ binName ] = Object.entries(pkgJson.bin)[0]
+const cli = sade(binName)
   .version(`v${pkgJson.version}`)
 
 fs.readdirSync(path.resolve(__dirname, '../commands'))

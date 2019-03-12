@@ -2,7 +2,8 @@ const fs = require('fs')
 const path = require('path')
 const execa = require('execa')
 const pkgJson = require('./package.json')
-const CLI_PATH = path.resolve(__dirname, pkgJson.bin)
+let [ BIN_NAME, BIN_PATH ] = Object.entries(pkgJson.bin)[0]
+BIN_PATH = path.resolve(__dirname, BIN_PATH)
 
 async function generate () {
   return Promise.all(
@@ -10,7 +11,7 @@ async function generate () {
       .filter(filename => !/^(\.|_)/.test(filename))
       .map(async (filename) => {
         const command = filename.slice(0, -3)
-        const { stdout } = await execa.shell(`${CLI_PATH} ${command} --help`)
+        const { stdout } = await execa.shell(`${BIN_PATH} ${command} --help`)
         const helpText = stdout
           .split('\n')
           // first and last lines are empty
@@ -19,7 +20,7 @@ async function generate () {
           .map(line => line.slice(2))
           .join('\n')
 
-        return `### ${pkgJson.name} ${command}\n\n\`\`\`\n${helpText}\n\`\`\``
+        return `### ${BIN_NAME} ${command}\n\n\`\`\`\n${helpText}\n\`\`\``
       })
   ).then(commands => '\n\n' + commands.join('\n\n') + '\n')
 }

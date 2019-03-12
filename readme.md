@@ -5,10 +5,7 @@
 ## Install
 
 ```sh
-npm i -g not-subtree
-
-# or just use npx
-npx not-subtree [...]
+npm i -g @chrisdothtml/not-subtree
 ```
 
 ## Use
