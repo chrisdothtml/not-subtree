@@ -37,6 +37,7 @@ async function push (argv) {
 
     if (diffFiles.length) {
       await shell([
+        `cd __temp__`,
         `git add .`,
         `git commit -m "${argv.message || 'Update tree'}"`,
         `git push`
@@ -45,10 +46,7 @@ async function push (argv) {
       console.warn('Warning: no changes to push')
     }
 
-    await shell([
-      `cd ..`,
-      `rm -rf __temp__`
-    ])
+    await shell(`rm -rf __temp__`)
   } else {
     console.warn('Warning: no changes to push')
   }
