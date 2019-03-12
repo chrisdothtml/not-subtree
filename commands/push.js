@@ -26,17 +26,30 @@ async function push (argv) {
       .filter(file => file.action === 'remove')
       .map(file => file.path.slice(argv.path.length + 1))
 
-    await execa.shell([
+    const { stdout } = await execa.shell([
       `git clone ${argv.remote} -b ${remoteBranch} __temp__`,
       filesToCopy.length && `cp -R ${filesToCopy.join(' ')} __temp__`,
       `cd __temp__`,
       filesToRemove.length && `rm -rf ${filesToRemove.join(' ')}`,
-      `git add .`,
-      `git commit -m "${argv.message || 'Update tree'}"`,
-      `git push`,
+      `echo "GIT_STATUS:$(git status -s)"`
+    ].filter(Boolean).join(' && '))
+
+    const diffFiles = parseGitStatusFiles(stdout.split('GIT_STATUS:')[1])
+
+    if (diffFiles.length) {
+      await execa.shell([
+        `git add .`,
+        `git commit -m "${argv.message || 'Update tree'}"`,
+        `git push`
+      ].join(' && '))
+    } else {
+      console.warn('Warning: no changes to push')
+    }
+
+    await execa.shell([
       `cd ..`,
       `rm -rf __temp__`
-    ].filter(Boolean).join(' && '))
+    ].join(' && '))
   } else {
     console.warn('Warning: no changes to push')
   }
