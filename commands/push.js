@@ -1,7 +1,7 @@
 const { parseGitStatusFiles, shell } = require('./_utils.js')
 
 async function push (argv) {
-  const { stdout: currentBranch } = await execa.shell(`git branch | grep \\* | cut -d ' ' -f2`)
+  const { stdout: currentBranch } = await shell(`git branch | grep \\* | cut -d ' ' -f2`)
   const baseBranch = argv.baseBranch || 'master'
   const remoteBranch = argv.remoteBranch || currentBranch
 

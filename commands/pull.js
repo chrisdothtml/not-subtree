@@ -42,7 +42,7 @@ async function pull (argv) {
     }
   } else {
     console.warn('Warning: no changes to pull')
-    await shell([`rm -rf __temp__`])
+    await shell(`rm -rf __temp__`)
   }
 }
 

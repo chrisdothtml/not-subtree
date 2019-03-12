@@ -27,5 +27,5 @@ if (parsedCli) {
     }
   }
 
-  handler.call(null, argv)
+  handler(argv)
 }

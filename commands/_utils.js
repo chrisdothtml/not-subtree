@@ -25,9 +25,11 @@ function pathExists (path) {
 // run a series of commands in the same spawned shell process;
 // filters falsy array elements (for inline conditional commands)
 async function shell (commands) {
-  return execa.shell(
-    commands.filter(Boolean).join(' && ')
-  )
+  if (Array.isArray(commands)) {
+    commands = commands.filter(Boolean).join(' && ')
+  }
+
+  return execa.shell(commands)
 }
 
 module.exports = {

@@ -26,13 +26,15 @@ test('pathExists', async (t) => {
 })
 
 test('shell', async (t) => {
-  const { stdout } = await shell([
+  const { stdout: stringStdout } = await shell('echo foo')
+  const { stdout: arrayStdout } = await shell([
     'echo foo',
     false && 'echo bar',
     'echo baz'
   ])
 
-  t.ok(stdout.includes('foo'))
-  t.notOk(stdout.includes('bar'))
-  t.ok(stdout.includes('baz'))
+  t.ok(stringStdout.includes('foo'))
+  t.ok(arrayStdout.includes('foo'))
+  t.notOk(arrayStdout.includes('bar'))
+  t.ok(arrayStdout.includes('baz'))
 })
