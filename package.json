@@ -2,6 +2,8 @@
   "name": "not-subtree",
   "description": "git subtrees without `git subtree`",
   "version": "0.0.1",
+  "author": "Chris Deacy <chrisdothtml@gmail.com>",
+  "repository": "github:chrisdothtml/not-subtree",
   "bin": "./bin/cli.js",
   "scripts": {
     "gen-docs": "node generate-docs.js"

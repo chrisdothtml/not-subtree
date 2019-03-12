@@ -4,7 +4,12 @@
 
 ## Install
 
-TODO
+```sh
+npm i -g not-subtree
+
+# or just use npx
+npx not-subtree [...]
+```
 
 ## Use
 
