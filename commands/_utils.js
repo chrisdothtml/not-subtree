@@ -1,3 +1,5 @@
+const fs = require('fs')
+
 // returns Array of { action: 'copy|remove', path: '' }
 function parseGitStatusFiles (input) {
   return input.split('\n')
@@ -10,6 +12,16 @@ function parseGitStatusFiles (input) {
     })
 }
 
+function pathExists (path) {
+  try {
+    fs.accessSync(path)
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
 module.exports = {
-  parseGitStatusFiles
+  parseGitStatusFiles,
+  pathExists
 }

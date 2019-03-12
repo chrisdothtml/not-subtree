@@ -1,7 +1,6 @@
 const execa = require('execa')
 const { parseGitStatusFiles } = require('./_utils.js')
 
-// TODO: log when no changes to push
 async function push (argv) {
   const { stdout: currentBranch } = await execa.shell(`git branch | grep \\* | cut -d ' ' -f2`)
   const baseBranch = argv.baseBranch || 'master'
@@ -9,36 +8,45 @@ async function push (argv) {
 
   const { stdout } = await execa.shell([
     `git checkout -b __temp__`,
-    // TODO: ensure baseBranch is available locally
+    // ensure base branch exists locally
+    `git checkout ${baseBranch}`,
+    `git checkout __temp__`,
     `git reset --mixed ${baseBranch}`,
-    `echo "\n\nGIT_STATUS:$(git status -s)"`
+    `echo "GIT_STATUS:$(git status -s)"`
   ].join(' && '))
 
-  const gitStatusFiles = parseGitStatusFiles(stdout.split('GIT_STATUS:')[1])
+  const changedFiles = parseGitStatusFiles(stdout.split('GIT_STATUS:')[1])
     .filter(file => file.path.startsWith(argv.path))
-  const filesToCopy = gitStatusFiles
-    .filter(file => file.action === 'copy')
-    .map(file => file.path.replace(/\/$/, ''))
-  const filesToRemove = gitStatusFiles
-    .filter(file => file.action === 'remove')
-    .map(file => file.path.slice(argv.path.length + 1))
+
+  if (changedFiles.length) {
+    const filesToCopy = changedFiles
+      .filter(file => file.action === 'copy')
+      .map(file => file.path.replace(/\/$/, ''))
+    const filesToRemove = changedFiles
+      .filter(file => file.action === 'remove')
+      .map(file => file.path.slice(argv.path.length + 1))
+
+    await execa.shell([
+      `git clone ${argv.remote} -b ${remoteBranch} __temp__`,
+      filesToCopy.length && `cp -R ${filesToCopy.join(' ')} __temp__`,
+      `cd __temp__`,
+      filesToRemove.length && `rm -rf ${filesToRemove.join(' ')}`,
+      `git add .`,
+      `git commit -m "${argv.message || 'Update tree'}"`,
+      `git push`,
+      `cd ..`,
+      `rm -rf __temp__`
+    ].filter(Boolean).join(' && '))
+  } else {
+    console.warn('Warning: no changes to push')
+  }
 
   return execa.shell([
-    // TODO: use os.tmpdir() instead
-    `git clone ${argv.remote} -b ${remoteBranch} __temp__`,
-    filesToCopy.length && `cp -R ${filesToCopy.join(' ')} __temp__`,
-    `cd __temp__`,
-    filesToRemove.length && `rm -rf ${filesToRemove.join(' ')}`,
-    `git add .`,
-    `git commit -m "${argv.message || 'Update tree'}"`,
-    `git push`,
-    `cd ..`,
-    `rm -rf __temp__`,
     `git checkout .`,
     `git clean -fd`,
     `git checkout ${currentBranch}`,
     `git branch -D __temp__`
-  ].filter(Boolean).join(' && '))
+  ].join(' && '))
 }
 
 module.exports = (cli) => {

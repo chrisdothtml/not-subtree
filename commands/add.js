@@ -1,13 +1,17 @@
 const execa = require('execa')
+const { pathExists } = require('./_utils.js')
 
-// TODO: error if path exists
 async function add (argv) {
-  return execa.shell([
-    `git clone ${argv.remote} -b ${argv.branch || 'master'} ${argv.path}`,
-    `rm -rf ${argv.path}/.git`,
-    `git add '${argv.path}/*'`,
-    `git commit -m "${argv.message || `Add '${argv.path}' tree`}"`
-  ].join(' && '))
+  if (pathExists(argv.path)) {
+    console.error(`Error: path already exists: ${argv.path}`)
+  } else {
+    await execa.shell([
+      `git clone ${argv.remote} -b ${argv.branch || 'master'} ${argv.path}`,
+      `rm -rf ${argv.path}/.git`,
+      `git add '${argv.path}/*'`,
+      `git commit -m "${argv.message || `Add '${argv.path}' tree`}"`
+    ].join(' && '))
+  }
 }
 
 module.exports = (cli) => {
